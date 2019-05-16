@@ -33,3 +33,89 @@ Boot 中的所有版本依赖，导入依赖时默认不需要写版本号，没
 
     配置文件的作用：修改 SpringBoot 自动配置的默认值 。yml 以数据为中心 比json 和 xml 更适合做配置文件。
 
+自动配置原理：
+    1).SpringBoot 启动的时候加载主配置类，开启了自动配置功能@EnableAutoConfiguration
+
+    2).@EnableAutoConfiguration
+            利用 AutoConfigurationImportSelector 给容器中导入一些组件。可以查看 selectImports() 方法
+            的内容,扫描所有 jar 包类路径下的 META-INF/spring-factories ，把扫描到的这些文件的内容包装
+            成 properties 对象，从 properties 中获取到 EnableAutoConfiguration.class 类(类名)对应的值
+            ，然后把它们添加到容器中。
+
+            将类路径下 META-INF/spring-factories 里面配置的所有 EnableAutoConfiguration
+            的值加入到了容器中。
+            spring-boot-autoconfigure-2.1.4.RELEASE.jar， 每一个 xxxAutoConfiguration
+            类都是容器中的一个组件，都加入到容器中，用它们来做自动配置。
+
+    3).每一个自动配置类进行自动配置
+
+    4).以 HttpEncodingAutoConfiguration (http编码自动配置) 为例解释自动配置原理
+
+       @Configuration  // 表示这是一个配置类 可以给容器添加组件
+
+       @EnableConfigurationProperties(HttpProperties.class) // 启用 ConfigurationProperties 功能
+         HttpProperties 中的 @ConfigurationProperties(prefix = "spring.http") 功能：将配置文件中
+         对应的值和HttpProperties绑定起来，并加入到ioc容器中
+
+       @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // Spring 底层
+            Conditional 注解，根据不同条件，如果满足指定条件，整个配置类里面的配置才会生效。判断当前
+            应用是否是 web 应用，如果是，当前配置类生效。
+
+       @ConditionalOnClass(CharacterEncodingFilter.class)// 判断当前项目有没有这个类
+            CharacterEncodingFilter: SpringMVC 中进行乱码解决的过滤器。
+
+       @ConditionalOnProperty(prefix = "spring.http.encoding", value = "enabled",
+       		matchIfMissing = true) // 判断配置文件中是否存在某个配置 spring.http.encoding
+       		 如果不存在，判断也是成立的。即使配置文件中不配置 spring.http.encoding.enabled
+       		 = true ,也是生效的。
+
+       public class HttpEncodingAutoConfiguration {
+
+        // 它已经和 SpringBoot 的配置文件映射了
+       	private final HttpProperties.Encoding properties;
+
+       	// 只有一个有参构造的情况下 参数的值就会从容器中拿
+       		public HttpEncodingAutoConfiguration(HttpProperties properties) {
+        		this.properties = properties.getEncoding();
+        	}
+
+       	@Bean   // 给容器中添加一个组件 这个组件的某些值需要从 properties 中获取。
+       	@ConditionalOnMissingBean// 容器中必须没有这个组件 CharacterEncodingFilter 才添加
+       	public CharacterEncodingFilter characterEncodingFilter() {
+       		CharacterEncodingFilter filter = new OrderedCharacterEncodingFilter();
+       		filter.setEncoding(this.properties.getCharset().name());
+       		filter.setForceRequestEncoding(this.properties.shouldForce(Type.REQUEST));
+       		filter.setForceResponseEncoding(this.properties.shouldForce(Type.RESPONSE));
+       		return filter;
+       	}
+       }
+
+       根据当前的不同条件判断决定这个配置类是否生效？
+       一旦这个配置类生效，就会给容器添加各种组件，这些组件的属性是从对应的 properties 类中获取的，
+       而这些类里面的每一个属性又是给配置文件绑定的；
+
+
+    5).所有在配置文件中能配置的属性都是在 xxxProperties 类中封装着，配置文件能配置什么就可以参照某个功能
+       对应的这个属性类。
+       // 从配置文件中获取指定的值和 bean 属性进行绑定
+       @ConfigurationProperties(prefix = "spring.http")
+       public class HttpProperties {}
+
+
+总结：1).SpringBoot 启动会加载大量的配置类
+      2).我们看我们需要的功能有没有 SpringBoot 默认写好的自动配置类
+      3).我们再来看这个自动配置类到底配置类哪些组件；只要有我们要用的组件有,我们就不需要再来配置了。
+      4).给容器中自动配置类添加组件的时候，会从 properties 类中获取某些属性，我们就可以在配置文件中
+         指定这些属性的值。
+
+      xxxAutoConfiguration 自动配置类
+      给容器中添加组件
+      对应的 xxxProperties 封装配置文件中相关属性
+
+
+@Conditional 派生注解 (Spring 注解版原生的 @Conditional 作用)
+作用：必须是 @Conditional 指定的条件成立，才给容器中添加组件，配置生效。
+自动配置类必须在一定的条件才能生效。
+
+
+

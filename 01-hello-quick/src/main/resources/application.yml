@@ -22,5 +22,5 @@ spring:
     encoding:
       charset: utf-8
 
-# 开启 SpringBoot 的 debug  查看自动配置报告
+# 开启 SpringBoot 的 debug = true  查看自动配置报告
 debug: true

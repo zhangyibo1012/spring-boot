@@ -1,0 +1,15 @@
+logging:
+  level:
+    # trace 级别日志
+    cn:
+      zyblogs: trace
+    # path 和 file 都不指定的话  日志会在控制台输出
+
+    # / 在当前磁盘的根路径下创建文件夹 log文件下使用 spring.log 作为默认文件 一般指定 path
+    # 不使用 file
+  path: /springboot/log
+
+    # 不指定路径在当前项目下生成 log 日志
+#  file: my.log
+
+

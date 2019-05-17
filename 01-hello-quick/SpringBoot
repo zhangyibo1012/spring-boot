@@ -38,7 +38,7 @@ Boot 中的所有版本依赖，导入依赖时默认不需要写版本号，没
 
     2).@EnableAutoConfiguration
             利用 AutoConfigurationImportSelector 给容器中导入一些组件。可以查看 selectImports() 方法
-            的内容,扫描所有 jar 包类路径下的 META-INF/spring-factories ，把扫描到的这些文件的内容包装
+            的内容, loadSpringFactories方法 扫描所有 jar 包类路径下的 META-INF/spring-factories ，把扫描到的这些文件的内容包装
             成 properties 对象，从 properties 中获取到 EnableAutoConfiguration.class 类(类名)对应的值
             ，然后把它们添加到容器中。
 

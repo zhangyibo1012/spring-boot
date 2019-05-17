@@ -11,5 +11,14 @@
 
     <artifactId>01-hello-quick</artifactId>
 
+    <dependencies>
+        <!-- 引入 webjars 在访问的时候只需要写
+        localhost:8080/webjars/jquery/3.4.1/jquery.js/jquery.min.js -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+    </dependencies>
 
 </project>

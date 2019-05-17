@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Yibo Zhang
  * @date 2019/05/16
  *
+ * https://github.com/lxy-go/SpringBoot/blob/master/SpringBoot%E5%85%A5%E9%97%A8%E7%AE%80%E4%BB%8B.md
+ *
  * @SpringBootApplication : 标注在某个类上就说明这个类是 SpringBoot 主配置类，Spring Boot
  *                          就应该运行这个类的 main 方法来启动 SpringBoot 应用。
  *

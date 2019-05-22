@@ -1,0 +1,4 @@
+org.springframework.context.ApplicationContextInitializer=\
+cn.zyblogs.listener.HelloApplicationContextInitializer
+org.springframework.boot.SpringApplicationRunListener=\
+cn.zyblogs.listener.HelloSpringApplicationRunListener
